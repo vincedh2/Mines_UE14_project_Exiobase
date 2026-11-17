@@ -4,17 +4,15 @@ import os, zipfile
 from pathlib import Path
 import numpy as np
 import pandas as pd
-def iso3_to_iso2(code: str) -> str:
+def iso3_to_iso2(code):
     manual = {'ROM':'RO','WWA':'WA','WWE':'WE','WWF':'WF','WWL':'WL','WWM':'WM'}
     if code in manual:
         return manual[code]
-    try:
-        import pycountry
-        result = pycountry.countries.get(alpha_3=code)
-        return result.alpha_2 if result else code
-    except Exception:
-        return code
-
+    import pycountry  # ImportError explicite si absent
+    c = pycountry.countries.get(alpha_3=code)
+    if c is None:
+        raise ValueError(f"Code ISO3 inconnu dans le .mat : {code}")
+    return c.alpha_2
 
 def load_kbar(path, key):
     import scipy.io
